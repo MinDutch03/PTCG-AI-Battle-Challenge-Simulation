@@ -20,9 +20,23 @@ import traceback
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
-def load_agent(spec: str):
+def load_agent(spec: str, deck_path: str | None = None):
+    """Load `agent` from a module; optionally override its deck selection."""
     mod = importlib.import_module(spec)
-    return getattr(mod, "agent")
+    if deck_path is None:
+        return getattr(mod, "agent")
+    with open(deck_path) as f:
+        deck = [int(x) for x in f.read().split() if x.strip()][:60]
+    if hasattr(mod, "make_agent"):
+        return mod.make_agent(deck)
+    fn = getattr(mod, "agent")
+
+    def with_deck(obs):
+        if obs["select"] is None:
+            return deck
+        return fn(obs)
+
+    return with_deck
 
 
 def empty_obs() -> dict:
@@ -81,13 +95,15 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--p0", required=True, help="agent module for seat 0")
     ap.add_argument("--p1", required=True, help="agent module for seat 1")
+    ap.add_argument("--deck0", help="deck csv override for p0")
+    ap.add_argument("--deck1", help="deck csv override for p1")
     ap.add_argument("-n", "--games", type=int, default=10)
     ap.add_argument("--no-swap", action="store_true", help="do not alternate seats")
     ap.add_argument("--log", help="write per-move JSONL log of the first game")
     args = ap.parse_args()
 
-    a = load_agent(args.p0)
-    b = load_agent(args.p1)
+    a = load_agent(args.p0, args.deck0)
+    b = load_agent(args.p1, args.deck1)
 
     # score from the perspective of --p0
     wins = losses = draws = crashes = 0
