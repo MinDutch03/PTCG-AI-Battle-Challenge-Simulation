@@ -9,3 +9,23 @@ archaludon vs grimmsnarl: 3-7
 archaludon vs trevenant: 4-6
 crustle vs dragapult: 9-1
 crustle vs grimmsnarl: 5-5
+crustle vs trevenant: 0-10
+dragapult vs grimmsnarl: 6-4
+dragapult vs trevenant: 7-3
+grimmsnarl vs trevenant: 6-4
+
+           abomasn archalu crustle dragapu grimmsn trevena
+abomasnow        -     30%     10%     60%     50%     30%
+archaludon     70%       -     70%     30%     30%     40%
+crustle        90%     30%       -     90%     50%      0%
+dragapult      40%     70%     10%       -     60%     70%
+grimmsnarl     50%     70%     50%     40%       -     60%
+trevenant      70%     60%    100%     30%     40%       -
+
+Standings (overall win rate):
+  trevenant    30/50 (60%)
+  grimmsnarl   27/50 (54%)
+  crustle      26/50 (52%)
+  dragapult    25/50 (50%)
+  archaludon   24/50 (48%)
+  abomasnow    18/50 (36%)
