@@ -5,17 +5,37 @@ determinized Monte-Carlo search (ptcg_agent.search) with layered fallbacks:
 search -> heuristic policy -> first-legal-option. The agent never raises.
 """
 
+import inspect
 import os
 import random
 import sys
 import time
 
-# __file__ can be undefined inside Kaggle's agent sandbox (main.py is exec'd).
-try:
-    _HERE = os.path.dirname(os.path.abspath(__file__))
-except NameError:
-    _HERE = "/kaggle_simulations/agent" if os.path.isdir(
-        "/kaggle_simulations/agent") else os.getcwd()
+
+def _agent_dir() -> str:
+    """Directory holding this file and deck.csv, under any loading scheme.
+
+    Kaggle exec()s main.py without __file__, so fall back to the compiled
+    code object's filename, then to sys.path entries that contain deck.csv.
+    """
+    try:
+        return os.path.dirname(os.path.abspath(__file__))
+    except NameError:
+        pass
+    try:
+        fn = inspect.currentframe().f_back.f_code.co_filename
+        d = os.path.dirname(os.path.abspath(fn))
+        if os.path.exists(os.path.join(d, "deck.csv")):
+            return d
+    except Exception:
+        pass
+    for d in ["/kaggle_simulations/agent", os.getcwd()] + list(sys.path):
+        if d and os.path.exists(os.path.join(d, "deck.csv")):
+            return d
+    return os.getcwd()
+
+
+_HERE = _agent_dir()
 if _HERE not in sys.path:
     sys.path.insert(0, _HERE)
 
@@ -30,7 +50,9 @@ except Exception:  # pragma: no cover - defensive
     _IMPORTS_OK = False
 
     def fallback(obs_dict: dict) -> list[int]:
-        sel = obs_dict["select"]
+        sel = obs_dict.get("select") if isinstance(obs_dict, dict) else None
+        if not sel:
+            return []
         need = sel["minCount"] if sel["minCount"] > 0 else min(1, sel["maxCount"])
         return list(range(need))
 
@@ -78,11 +100,14 @@ def make_agent(deck: list[int] | None = None, seed: int = 20260711):
             return search.decide(obs, state["deck"], deadline, rng)
         except Exception:
             try:
-                if _IMPORTS_OK:
+                if _IMPORTS_OK and obs_dict.get("select") is not None:
                     return choose(to_observation_class(obs_dict), random)
             except Exception:
                 pass
-            return fallback(obs_dict)
+            try:
+                return fallback(obs_dict)
+            except Exception:
+                return []
 
     return _agent
 

@@ -251,6 +251,8 @@ def choose(obs: Observation, rng: random.Random | None = None) -> list[int]:
 
 def fallback(obs_dict: dict) -> list[int]:
     """Last-resort legal move from the raw dict, no card knowledge needed."""
-    sel = obs_dict["select"]
+    sel = obs_dict.get("select") if isinstance(obs_dict, dict) else None
+    if not sel:
+        return []
     need = sel["minCount"] if sel["minCount"] > 0 else min(1, sel["maxCount"])
     return list(range(need))
