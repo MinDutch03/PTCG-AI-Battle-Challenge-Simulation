@@ -22,7 +22,7 @@ from . import determinize
 from .evaluate import evaluate
 from .heuristics import choose
 
-MAX_DETERMINIZATIONS = 6
+MAX_DETERMINIZATIONS = 8
 MAX_ROLLOUT_STEPS = 80
 MAX_CANDIDATES = 16
 

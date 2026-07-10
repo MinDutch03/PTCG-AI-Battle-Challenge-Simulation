@@ -37,7 +37,7 @@ def _budget(obs_dict: dict, obs) -> float:
     """Seconds to spend on this decision."""
     remaining = obs_dict.get("remainingOverageTime", 600) or 0
     if remaining > 400:
-        base = 0.9
+        base = 1.2
     elif remaining > 200:
         base = 0.5
     elif remaining > 60:
