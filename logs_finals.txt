@@ -1,1 +1,13 @@
 trevenant vs grimmsnarl: 12-18
+trevenant vs dragapult: 8-22
+grimmsnarl vs dragapult: 21-9
+
+           trevena grimmsn dragapu
+trevenant        -     40%     27%
+grimmsnarl     60%       -     70%
+dragapult      73%     30%       -
+
+Standings (overall win rate):
+  grimmsnarl   39/60 (65%)
+  dragapult    31/60 (52%)
+  trevenant    20/60 (33%)
