@@ -63,8 +63,12 @@ def play_game(agent0, agent1, verbose=False, log_file=None):
         raise RuntimeError(f"deck error, player {start_data.errorPlayer}")
 
     turns = 0
+    steps = 0
     try:
         while True:
+            steps += 1
+            if steps > 5000:
+                return 2, turns, times  # runaway game -> draw
             s = obs["current"]
             if s["result"] >= 0:
                 return s["result"], s["turn"], times

@@ -23,7 +23,7 @@ from .evaluate import evaluate
 from .heuristics import choose
 
 MAX_DETERMINIZATIONS = 6
-MAX_ROLLOUT_STEPS = 60
+MAX_ROLLOUT_STEPS = 80
 MAX_CANDIDATES = 16
 
 _search_failures = 0
@@ -70,11 +70,23 @@ def _candidates(obs: Observation, rng: random.Random) -> list[list[int]]:
     return [list(c) for c in uniq[:MAX_CANDIDATES]]
 
 
-def _rollout(state, root_turn: int, rng: random.Random):
-    """Play heuristically inside the sandbox until the turn finishes."""
+def _stop_turn(state, me: int) -> int:
+    """Roll until this turn number is exceeded: through the end of our own
+    turn AND the opponent's reply turn, so the evaluation sees the punch-back.
+    If we are deciding during the opponent's turn (forced switch etc.), their
+    current turn already is the reply."""
+    t = state.turn
+    if t <= 0:
+        return 1
+    my_turn = (t % 2 == 1) == (me == state.firstPlayer)
+    return t + 1 if my_turn else t
+
+
+def _rollout(state, stop_turn: int, rng: random.Random):
+    """Play heuristically inside the sandbox until stop_turn is over."""
     for _ in range(MAX_ROLLOUT_STEPS):
         cur = state.observation.current
-        if cur.result >= 0 or cur.turn > root_turn:
+        if cur.result >= 0 or cur.turn > stop_turn:
             break
         state = search_step(state.searchId, choose(state.observation, rng))
     return state
@@ -102,7 +114,7 @@ def decide(obs: Observation, my_deck_list: list[int], deadline: float,
         return cands[0]
 
     me = obs.current.yourIndex
-    root_turn = obs.current.turn
+    stop_turn = _stop_turn(obs.current, me)
     totals = [0.0] * len(cands)
     counts = [0] * len(cands)
 
@@ -117,7 +129,7 @@ def decide(obs: Observation, my_deck_list: list[int], deadline: float,
                     if time.time() > deadline and counts[0] > 0:
                         break
                     st = search_step(root.searchId, cand)
-                    st = _rollout(st, root_turn, rng)
+                    st = _rollout(st, stop_turn, rng)
                     totals[ci] += evaluate(st.observation.current, me)
                     counts[ci] += 1
             finally:
