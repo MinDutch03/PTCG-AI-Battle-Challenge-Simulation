@@ -12,6 +12,8 @@ from collections import Counter
 
 from cg.api import Observation, State
 
+from . import opponent as opponent_model
+
 FILLER_UNKNOWN = 1  # Basic Grass Energy — inert placeholder for unknown cards
 FILLER_BASIC = 1072  # Snorlax — community-standard basic Pokemon placeholder
 _PAD = 64  # native SearchBegin reads array lengths from game state; padding
@@ -68,13 +70,37 @@ def sample(obs: Observation, my_deck_list: list[int], rng: random.Random):
     while len(my_deck) < max(my_ps.deckCount, _PAD):
         my_deck.append(FILLER_UNKNOWN)
 
-    opp_hand = [FILLER_UNKNOWN] * max(opp_ps.handCount, _PAD)
-    if state.turn <= 0 or not opp_ps.active:
-        opp_hand[0] = FILLER_BASIC  # setup: opponent must be able to place an active
-    opp_prize = [c.id if c is not None else FILLER_UNKNOWN for c in opp_ps.prize]
+    # Opponent hidden zones: deal from an inferred meta list when the visible
+    # cards identify the archetype, otherwise use inert filler.
+    hidden = opponent_model.infer_deck(state, opp)
+    need_hand = opp_ps.handCount
+    need_deck = opp_ps.deckCount
+    n_prize_down = sum(1 for c in opp_ps.prize if c is None)
+    if hidden is not None and len(hidden) >= need_hand + need_deck + n_prize_down:
+        rng.shuffle(hidden)
+        opp_hand = [hidden.pop() for _ in range(need_hand)]
+        opp_prize = [c.id if c is not None else hidden.pop() for c in opp_ps.prize]
+        opp_deck = [hidden.pop() for _ in range(need_deck)]
+        if state.turn <= 0 or not opp_ps.active:
+            from .cards import is_basic_pokemon
+
+            # setup: their predicted hand must hold a basic Pokemon, and the
+            # engine requires one in the predicted deck as well
+            if opp_hand and not any(is_basic_pokemon(c) for c in opp_hand):
+                opp_hand[0] = FILLER_BASIC
+            if opp_deck and not any(is_basic_pokemon(c) for c in opp_deck):
+                opp_deck[0] = FILLER_BASIC
+    else:
+        opp_hand = [FILLER_UNKNOWN] * max(need_hand, 1)
+        if state.turn <= 0 or not opp_ps.active:
+            opp_hand[0] = FILLER_BASIC  # setup: opponent must be able to place an active
+        opp_prize = [c.id if c is not None else FILLER_UNKNOWN for c in opp_ps.prize]
+        opp_deck = [FILLER_UNKNOWN] * max(need_deck, 1)
+        opp_deck[0] = FILLER_BASIC  # setup requires a basic Pokemon in the deck
+
+    opp_hand += [FILLER_UNKNOWN] * (_PAD - len(opp_hand))
     opp_prize += [FILLER_UNKNOWN] * (_PAD - len(opp_prize))
-    opp_deck = [FILLER_UNKNOWN] * max(opp_ps.deckCount, _PAD)
-    opp_deck[0] = FILLER_BASIC  # setup requires a basic Pokemon in the deck
+    opp_deck += [FILLER_UNKNOWN] * max(_PAD - len(opp_deck), 0)
 
     opp_active = [FILLER_BASIC] * 4
     my_prize_padded = my_prize + [FILLER_UNKNOWN] * (_PAD - len(my_prize))
