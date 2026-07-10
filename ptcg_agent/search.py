@@ -118,27 +118,38 @@ def decide(obs: Observation, my_deck_list: list[int], deadline: float,
     totals = [0.0] * len(cands)
     counts = [0] * len(cands)
 
+    active = list(range(len(cands)))
     try:
-        for _ in range(MAX_DETERMINIZATIONS):
+        for det_i in range(MAX_DETERMINIZATIONS):
             if time.time() > deadline:
                 break
             det = determinize.sample(obs, my_deck_list, rng)
             root = search_begin(obs, *det)
             try:
-                for ci, cand in enumerate(cands):
-                    if time.time() > deadline and counts[0] > 0:
+                for ci in active:
+                    if time.time() > deadline and counts[ci] > 0:
                         break
-                    st = search_step(root.searchId, cand)
+                    st = search_step(root.searchId, cands[ci])
                     st = _rollout(st, stop_turn, rng)
                     totals[ci] += evaluate(st.observation.current, me)
                     counts[ci] += 1
             finally:
                 search_end()
+            if det_i == 0 and len(active) > 5:
+                # Screening pass done: keep only the promising candidates.
+                scored_now = [i for i in active if counts[i] > 0]
+                scored_now.sort(key=lambda i: totals[i] / counts[i], reverse=True)
+                active = scored_now[:5]
     except Exception:
         _search_failures += 1
         return choose(obs, rng)
 
-    scored = [(totals[i] / counts[i], i) for i in range(len(cands)) if counts[i] > 0]
+    # Only survivors of the screening pass compete: a pruned candidate's
+    # single-sample score must not beat a multi-sample average on a fluke.
+    scored = [(totals[i] / counts[i], i) for i in active if counts[i] > 0]
+    if not scored:
+        scored = [(totals[i] / counts[i], i) for i in range(len(cands))
+                  if counts[i] > 0]
     if not scored:
         return choose(obs, rng)
     best = max(scored)[1]
