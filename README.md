@@ -52,6 +52,24 @@ locally in round-robin tournaments under *this* pilot (`tools/tournament.py`),
 because the best deck is the one the pilot plays best, not the best deck in
 human hands.
 
+## Results (local, both sides piloted by this agent)
+
+Deck selection was decided empirically. Six-deck round-robin at 10 games/pair
+gave a shortlist; the top three replayed at 30 games/pair:
+
+| Matchup (n=30 each) | Win rate |
+|---|---|
+| Grimmsnarl vs Dragapult | 70% |
+| Grimmsnarl vs Trevenant | 60% |
+| Grimmsnarl vs Archaludon | 70% |
+| Dragapult vs Trevenant | 73% |
+
+Marnie's Grimmsnarl ex is the submitted deck: no losing matchup found against
+any tested archetype (5-5 vs Crustle wall and Mega Abomasnow at n=10), and it
+beats the two most common ladder decks head-to-head. Against fixed baselines
+with the same deck, the search pilot wins ~70% vs the heuristic-only policy
+and ~100% vs random.
+
 ## Repo layout
 
 ```
