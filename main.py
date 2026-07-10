@@ -19,9 +19,20 @@ except NameError:
 if _HERE not in sys.path:
     sys.path.insert(0, _HERE)
 
-from cg.api import SelectType, to_observation_class  # noqa: E402
-from ptcg_agent import search  # noqa: E402
-from ptcg_agent.heuristics import choose, fallback  # noqa: E402
+# If anything here fails (engine binary missing/incompatible on the host),
+# the module still loads and the agent plays on raw-dict fallback logic.
+try:
+    from cg.api import SelectType, to_observation_class  # noqa: E402
+    from ptcg_agent import search  # noqa: E402
+    from ptcg_agent.heuristics import choose, fallback  # noqa: E402
+    _IMPORTS_OK = True
+except Exception:  # pragma: no cover - defensive
+    _IMPORTS_OK = False
+
+    def fallback(obs_dict: dict) -> list[int]:
+        sel = obs_dict["select"]
+        need = sel["minCount"] if sel["minCount"] > 0 else min(1, sel["maxCount"])
+        return list(range(need))
 
 def read_deck_csv() -> list[int]:
     for path in ("deck.csv",
@@ -60,14 +71,18 @@ def make_agent(deck: list[int] | None = None, seed: int = 20260711):
                 state["deck"] = read_deck_csv()
             if obs_dict["select"] is None:
                 return state["deck"]
+            if not _IMPORTS_OK:
+                return fallback(obs_dict)
             obs = to_observation_class(obs_dict)
             deadline = time.time() + _budget(obs_dict, obs)
             return search.decide(obs, state["deck"], deadline, rng)
         except Exception:
             try:
-                return choose(to_observation_class(obs_dict), random)
+                if _IMPORTS_OK:
+                    return choose(to_observation_class(obs_dict), random)
             except Exception:
-                return fallback(obs_dict)
+                pass
+            return fallback(obs_dict)
 
     return _agent
 

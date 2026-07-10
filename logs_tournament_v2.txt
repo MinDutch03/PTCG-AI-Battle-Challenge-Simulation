@@ -6,3 +6,6 @@ abomasnow vs trevenant: 3-7
 archaludon vs crustle: 7-3
 archaludon vs dragapult: 3-7
 archaludon vs grimmsnarl: 3-7
+archaludon vs trevenant: 4-6
+crustle vs dragapult: 9-1
+crustle vs grimmsnarl: 5-5
