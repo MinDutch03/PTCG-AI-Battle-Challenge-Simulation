@@ -1,0 +1,8 @@
+# Validation image: runs the real kaggle-environments "cabt" episode flow,
+# matching how Kaggle validates a submission (self-play episode).
+# Build:  docker build --platform linux/amd64 -f tools/Dockerfile.kaggle -t cabt-kaggle tools
+FROM --platform=linux/amd64 python:3.11-slim
+ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1
+RUN pip install --no-cache-dir kaggle-environments
+WORKDIR /work
+CMD ["python"]

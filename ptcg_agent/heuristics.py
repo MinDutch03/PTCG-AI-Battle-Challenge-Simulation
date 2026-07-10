@@ -125,6 +125,16 @@ def choose(obs: Observation, rng: random.Random | None = None) -> list[int]:
         return order[:count]
 
     if sel.type == SelectType.MAIN:
+        # Anti-loop guard: some abilities (energy shuffling etc.) stay legal
+        # forever; after many actions this turn, wrap up with attack/end.
+        if state.turnActionCount > 20:
+            wrap = [i for i, o in enumerate(opts)
+                    if o.type in (OptionType.ATTACK, OptionType.END)]
+            if wrap:
+                atk = [i for i in wrap if opts[i].type == OptionType.ATTACK]
+                if atk:
+                    return [max(atk, key=lambda i: _attack_damage(opts[i].attackId or 0))]
+                return [wrap[0]]
         scores = [_main_priority(state, me, o) for o in opts]
         return [max(range(n), key=lambda i: scores[i])]
 
