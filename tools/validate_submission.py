@@ -29,12 +29,14 @@ def main():
             sys.exit(f"{required} missing from archive root")
 
     os.chdir(tempfile.mkdtemp(prefix="cwd_"))  # cwd is NOT the agent dir on Kaggle
-    sys.path.insert(0, agent_dir)
 
-    import importlib
+    # Load exactly the way Kaggle does: exec main.py, take the last callable.
+    from kaggle_environments.agent import get_last_callable
 
-    main_mod = importlib.import_module("main")
-    agent = main_mod.agent
+    main_path = os.path.join(agent_dir, "main.py")
+    with open(main_path) as f:
+        agent = get_last_callable(f.read(), path=main_path)
+    print("loaded agent callable:", agent)
 
     from kaggle_environments import make
 
