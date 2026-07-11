@@ -1,0 +1,15 @@
+game 1/12: loss (turns=14)
+game 2/12: win (turns=40)
+game 3/12: win (turns=21)
+game 4/12: loss (turns=21)
+game 5/12: loss (turns=36)
+game 6/12: loss (turns=7)
+game 7/12: loss (turns=14)
+game 8/12: win (turns=2)
+game 9/12: loss (turns=12)
+game 10/12: loss (turns=9)
+game 11/12: loss (turns=12)
+game 12/12: loss (turns=11)
+
+main vs main: 3W-9L-0D (25.0% win) crashes=0
+avg turns 16.6, wall 455.1s, agent time p0=169.3s p1=285.4s (14.11s/game vs 23.78s/game)
