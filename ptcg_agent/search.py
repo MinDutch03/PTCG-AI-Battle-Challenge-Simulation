@@ -22,8 +22,8 @@ from . import determinize
 from .evaluate import evaluate
 from .heuristics import choose
 
-MAX_DETERMINIZATIONS = 8
-MAX_ROLLOUT_STEPS = 80
+MAX_DETERMINIZATIONS = 16
+MAX_ROLLOUT_STEPS = 120
 MAX_CANDIDATES = 16
 
 _search_failures = 0
@@ -93,7 +93,7 @@ def _rollout(state, stop_turn: int, rng: random.Random):
 
 
 def decide(obs: Observation, my_deck_list: list[int], deadline: float,
-           rng: random.Random) -> list[int]:
+           rng: random.Random, safety: bool = True) -> list[int]:
     """Best selection for this observation, within the time budget."""
     global _search_failures
 
@@ -113,44 +113,68 @@ def decide(obs: Observation, my_deck_list: list[int], deadline: float,
     if len(cands) == 1:
         return cands[0]
 
+    # Evaluate the heuristic pick first: if the clock cuts the screening pass
+    # short, the sampled scores still include the policy move.
+    base = choose(obs, rng)
+    if base in cands:
+        cands.remove(base)
+    cands.insert(0, base)
+
     me = obs.current.yourIndex
     stop_turn = _stop_turn(obs.current, me)
     totals = [0.0] * len(cands)
     counts = [0] * len(cands)
+    wins = [0] * len(cands)
+    losses = [0] * len(cands)
 
     active = list(range(len(cands)))
     try:
         for det_i in range(MAX_DETERMINIZATIONS):
-            if time.time() > deadline:
+            if time.time() > deadline and det_i > 0:
                 break
             det = determinize.sample(obs, my_deck_list, rng)
             root = search_begin(obs, *det)
             try:
                 for ci in active:
-                    if time.time() > deadline and counts[ci] > 0:
+                    if time.time() > deadline and any(counts):
                         break
                     st = search_step(root.searchId, cands[ci])
                     st = _rollout(st, stop_turn, rng)
-                    totals[ci] += evaluate(st.observation.current, me)
+                    end = st.observation.current
+                    totals[ci] += evaluate(end, me)
                     counts[ci] += 1
+                    if end.result == me:
+                        wins[ci] += 1
+                    elif end.result == 1 - me:
+                        losses[ci] += 1
             finally:
                 search_end()
-            if det_i == 0 and len(active) > 5:
+            if det_i == 0 and len(active) > 6:
                 # Screening pass done: keep only the promising candidates.
                 scored_now = [i for i in active if counts[i] > 0]
                 scored_now.sort(key=lambda i: totals[i] / counts[i], reverse=True)
-                active = scored_now[:5]
+                active = scored_now[:6]
     except Exception:
         _search_failures += 1
         return choose(obs, rng)
 
     # Only survivors of the screening pass compete: a pruned candidate's
     # single-sample score must not beat a multi-sample average on a fluke.
-    scored = [(totals[i] / counts[i], i) for i in active if counts[i] > 0]
-    if not scored:
-        scored = [(totals[i] / counts[i], i) for i in range(len(cands))
-                  if counts[i] > 0]
-    if not scored:
+    pool = [i for i in active if counts[i] > 0]
+    if not pool:
+        pool = [i for i in range(len(cands)) if counts[i] > 0]
+    if not pool:
         return choose(obs, rng)
-    best = max(scored)[1]
-    return cands[best]
+
+    if safety:
+        # Lethal: a candidate that won in every sampled world is taken, period.
+        sure = [i for i in pool if wins[i] == counts[i] and counts[i] >= 2]
+        if sure:
+            return cands[max(sure, key=lambda i: totals[i] / counts[i])]
+        # Loss veto: given equally-informed alternatives that never lost,
+        # do not pick a line that loses in some sampled world.
+        safe = [i for i in pool if losses[i] == 0]
+        if safe:
+            pool = safe
+
+    return cands[max(pool, key=lambda i: totals[i] / counts[i])]

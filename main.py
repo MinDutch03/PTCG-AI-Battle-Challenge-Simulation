@@ -66,23 +66,35 @@ def read_deck_csv() -> list[int]:
     raise FileNotFoundError("deck.csv not found")
 
 
+_TIME_SCALE = float(os.environ.get("PTCG_TIME_SCALE", "1"))
+
+
 def _budget(obs_dict: dict, obs) -> float:
-    """Seconds to spend on this decision."""
+    """Seconds to spend on this decision.
+
+    The overage pool is 600s per episode and a game runs ~100-200 decisions;
+    an average near 2.5s/decision uses the clock instead of donating it.
+    Throttles as the pool drains, heuristics-only when it is nearly gone.
+    PTCG_TIME_SCALE (<1) speeds up local evaluation runs.
+    """
     remaining = obs_dict.get("remainingOverageTime", 600) or 0
-    if remaining > 400:
-        base = 1.2
-    elif remaining > 200:
-        base = 0.5
+    if remaining > 450:
+        base = 3.0
+    elif remaining > 300:
+        base = 1.5
+    elif remaining > 150:
+        base = 0.8
     elif remaining > 60:
-        base = 0.2
+        base = 0.3
     else:
         return 0.0  # heuristics only, preserve the clock
-    if obs.select.type in (SelectType.MAIN, SelectType.ATTACK):
-        return base
-    return base * 0.6
+    if obs.select.type not in (SelectType.MAIN, SelectType.ATTACK):
+        base *= 0.6
+    return base * _TIME_SCALE
 
 
-def make_agent(deck: list[int] | None = None, seed: int = 20260711):
+def make_agent(deck: list[int] | None = None, seed: int = 20260711,
+               safety: bool = True):
     """Build an agent closure bound to a specific deck (for local harnesses)."""
     rng = random.Random(seed)
     state = {"deck": deck}
@@ -96,8 +108,12 @@ def make_agent(deck: list[int] | None = None, seed: int = 20260711):
             if not _IMPORTS_OK:
                 return fallback(obs_dict)
             obs = to_observation_class(obs_dict)
-            deadline = time.time() + _budget(obs_dict, obs)
-            return search.decide(obs, state["deck"], deadline, rng)
+            budget = _budget(obs_dict, obs)
+            if budget <= 0:
+                return choose(obs, rng)
+            deadline = time.time() + budget
+            return search.decide(obs, state["deck"], deadline, rng,
+                                 safety=safety)
         except Exception:
             try:
                 if _IMPORTS_OK and obs_dict.get("select") is not None:
