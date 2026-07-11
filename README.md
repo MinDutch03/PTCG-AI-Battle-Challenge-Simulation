@@ -52,6 +52,18 @@ locally in round-robin tournaments under *this* pilot (`tools/tournament.py`),
 because the best deck is the one the pilot plays best, not the best deck in
 human hands.
 
+## Ladder feedback loop
+
+The Kaggle MCP server (`tools/kaggle_mcp.py`) pulls our submissions' episode
+lists, replays and agent logs; `tools/analyze_replays.py` summarizes them
+(opponent archetype, end reason, clock usage). Auditing real ladder losses
+found the decisive pilot bugs (declined own-card effects, END chosen over a
+powered attack, energy-less ex promoted as a shield) and produced the
+dominance floors in `ptcg_agent/search.py`. Opponent decks harvested from
+replays feed the inference library in `ptcg_agent/meta_decks/`. After the
+fixes, the Mega Lucario matchup — 1-11 on the ladder, 35% of all losses —
+retested at ~53% (n=36), with the ladder-weighted expected winrate at ~60%.
+
 ## Results (local, both sides piloted by this agent)
 
 Deck selection was decided empirically. Six-deck round-robin at 10 games/pair
