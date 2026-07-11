@@ -84,6 +84,6 @@ def infer_deck(state: State, opponent: int) -> list[int] | None:
             rest.subtract(seen)
             best_name, best_cover = name, cover
             best_rest = [cid for cid, k in rest.items() for _ in range(max(k, 0))]
-    if best_cover >= 0.7 and best_rest:
+    if best_cover >= 0.6 and best_rest:
         return best_rest
     return None

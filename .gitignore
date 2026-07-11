@@ -3,3 +3,5 @@ __pycache__/
 *.pyc
 submission.tar.gz
 logs/
+.env
+.DS_Store

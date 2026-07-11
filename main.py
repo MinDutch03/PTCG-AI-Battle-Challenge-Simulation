@@ -79,13 +79,13 @@ def _budget(obs_dict: dict, obs) -> float:
     """
     remaining = obs_dict.get("remainingOverageTime", 600) or 0
     if remaining > 450:
-        base = 3.0
+        base = 4.5
     elif remaining > 300:
-        base = 1.5
+        base = 2.5
     elif remaining > 150:
-        base = 0.8
+        base = 1.2
     elif remaining > 60:
-        base = 0.3
+        base = 0.4
     else:
         return 0.0  # heuristics only, preserve the clock
     if obs.select.type not in (SelectType.MAIN, SelectType.ATTACK):
