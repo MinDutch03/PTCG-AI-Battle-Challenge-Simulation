@@ -12,6 +12,8 @@ import time
 
 from cg.api import (
     Observation,
+    OptionType,
+    SelectContext,
     SelectType,
     search_begin,
     search_end,
@@ -186,4 +188,29 @@ def decide(obs: Observation, my_deck_list: list[int], deadline: float,
         if sure:
             return cands[max(sure, key=lambda i: totals[i] / counts[i])]
 
-    return cands[max(pool, key=lambda i: totals[i] / counts[i])]
+    avg = lambda i: totals[i] / counts[i]  # noqa: E731
+    best = max(pool, key=avg)
+
+    # Dominance floors: late-game determinizations are few (search_begin
+    # replays the whole history), so noisy averages must not override
+    # obviously-dominant lines (audited ladder losses did exactly this).
+    def _opt_type(i):
+        c = cands[i]
+        return sel.option[c[0]].type if len(c) == 1 else None
+
+    if sel.type == SelectType.MAIN and _opt_type(best) == OptionType.END:
+        # Passing must beat attacking by a clear margin (~1 prize).
+        attacks = [i for i in pool if _opt_type(i) == OptionType.ATTACK]
+        if attacks:
+            best_atk = max(attacks, key=avg)
+            if avg(best) - avg(best_atk) < 1000.0:
+                best = best_atk
+    if sel.type == SelectType.YES_NO and sel.context == SelectContext.ACTIVATE:
+        # Own-card effects are near-universally beneficial: declining needs
+        # a clear margin (Punk Up declines threw audited games).
+        yes = [i for i in pool if _opt_type(i) == OptionType.YES]
+        if yes and _opt_type(best) == OptionType.NO \
+                and avg(best) - avg(yes[0]) < 400.0:
+            best = yes[0]
+
+    return cands[best]

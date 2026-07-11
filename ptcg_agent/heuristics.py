@@ -207,14 +207,22 @@ def choose(obs: Observation, rng: random.Random | None = None) -> list[int]:
             # Choosing the OPPONENT's new active (Boss's Orders etc.): drag in
             # their weakest, most nearly-KO'd piece — the opposite of picking
             # our own best fighter.
+            from .cards import prize_value
+
             if o.playerIndex is not None and o.playerIndex != me:
                 p = _pokemon_at(state, o.playerIndex, o.area, o.index)
                 if p is None:
                     return 0.0
-                from .cards import prize_value
                 return 500.0 - p.hp + 40.0 * prize_value(p.id) \
                     - 10.0 * len(p.energies)
-            return _option_pokemon_value(state, o)
+            v = _option_pokemon_value(state, o)
+            # Never feed a multi-prize body that cannot fight back: an
+            # energy-less ex promoted as a shield is 2-3 free prizes.
+            p = _pokemon_at(state, o.playerIndex if o.playerIndex is not None
+                            else me, o.area, o.index)
+            if p is not None and not p.energies:
+                v -= 90.0 * prize_value(p.id)
+            return v
 
         return top([promote_value(o) for o in opts], count)
     if ctx == SelectContext.SETUP_BENCH_POKEMON:
@@ -251,8 +259,11 @@ def choose(obs: Observation, rng: random.Random | None = None) -> list[int]:
                 except (IndexError, TypeError):
                     cid = None
             return _card_value(cid) if cid is not None else 20.0
+        # Fetch/attach effects are free value: take the maximum allowed
+        # (a Punk Up that attaches 2 of 5 energies threw an audited game).
         want = hi if ctx in (SelectContext.TO_HAND, SelectContext.TO_FIELD,
-                             SelectContext.TO_BENCH) else max(lo, 1)
+                             SelectContext.TO_BENCH, SelectContext.ATTACH_TO,
+                             SelectContext.EFFECT_TARGET) else max(lo, 1)
         return top([fetch_value(o) for o in opts], max(lo, min(want, hi)))
     if ctx in (SelectContext.ATTACH_FROM, SelectContext.DETACH_FROM):
         return top([_option_pokemon_value(state, o) for o in opts], count)
