@@ -109,7 +109,7 @@ def make_agent(deck: list[int] | None = None, seed: int = 20260711,
                 return fallback(obs_dict)
             obs = to_observation_class(obs_dict)
             state["n"] = state.get("n", 0) + 1
-            if state["n"] % 25 == 1:
+            if state["n"] % 25 == 1 and "remainingOverageTime" in obs_dict:
                 # Search-health heartbeat; shows up in Kaggle agent logs.
                 print(f"[ptcg] decision {state['n']}: turn "
                       f"{obs.current.turn if obs.current else '?'} "
