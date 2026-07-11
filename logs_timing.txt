@@ -1,0 +1,7 @@
+game 1/4: loss (turns=17)
+game 2/4: win (turns=13)
+game 3/4: win (turns=9)
+game 4/4: loss (turns=19)
+
+main vs baselines.greedy_agent: 2W-2L-0D (50.0% win) crashes=0
+avg turns 14.5, wall 98.1s, agent time p0=97.9s p1=0.1s (24.48s/game vs 0.01s/game)

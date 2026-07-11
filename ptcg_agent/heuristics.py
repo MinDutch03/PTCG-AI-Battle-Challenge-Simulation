@@ -202,7 +202,21 @@ def choose(obs: Observation, rng: random.Random | None = None) -> list[int]:
                 best = max((_attack_damage(a) for a in c.attacks), default=0)
                 return c.hp * 0.4 + best * 0.5
             return top([setup_value(o) for o in opts], count)
-        return top([_option_pokemon_value(state, o) for o in opts], count)
+
+        def promote_value(o):
+            # Choosing the OPPONENT's new active (Boss's Orders etc.): drag in
+            # their weakest, most nearly-KO'd piece — the opposite of picking
+            # our own best fighter.
+            if o.playerIndex is not None and o.playerIndex != me:
+                p = _pokemon_at(state, o.playerIndex, o.area, o.index)
+                if p is None:
+                    return 0.0
+                from .cards import prize_value
+                return 500.0 - p.hp + 40.0 * prize_value(p.id) \
+                    - 10.0 * len(p.energies)
+            return _option_pokemon_value(state, o)
+
+        return top([promote_value(o) for o in opts], count)
     if ctx == SelectContext.SETUP_BENCH_POKEMON:
         return list(range(min(hi, n)))  # bench everything
     if ctx in (SelectContext.DISCARD, SelectContext.TO_DECK,

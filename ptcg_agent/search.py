@@ -168,13 +168,10 @@ def decide(obs: Observation, my_deck_list: list[int], deadline: float,
 
     if safety:
         # Lethal: a candidate that won in every sampled world is taken, period.
+        # (No loss-veto beyond this: the terminal +/-1M inside the averages
+        # already prices loss risk; a hard veto turns late-game turns passive.)
         sure = [i for i in pool if wins[i] == counts[i] and counts[i] >= 2]
         if sure:
             return cands[max(sure, key=lambda i: totals[i] / counts[i])]
-        # Loss veto: given equally-informed alternatives that never lost,
-        # do not pick a line that loses in some sampled world.
-        safe = [i for i in pool if losses[i] == 0]
-        if safe:
-            pool = safe
 
     return cands[max(pool, key=lambda i: totals[i] / counts[i])]
