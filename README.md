@@ -67,8 +67,17 @@ gave a shortlist; the top three replayed at 30 games/pair:
 Marnie's Grimmsnarl ex is the submitted deck: no losing matchup found against
 any tested archetype (5-5 vs Crustle wall and Mega Abomasnow at n=10), and it
 beats the two most common ladder decks head-to-head. Against fixed baselines
-with the same deck, the search pilot wins ~70% vs the heuristic-only policy
-and ~100% vs random.
+with the same deck, the search pilot wins ~93% vs the heuristic-only policy
+(n=30) and ~100% vs random.
+
+Two decision-quality layers came out of auditing full game logs move by move:
+a guaranteed-lethal fast-path (an action that wins in every sampled world is
+taken immediately), and correct gust targeting — when a rollout picks the
+opponent's forced new active (Boss's Orders), it drags their weakest,
+highest-prize piece instead of reusing the "best fighter" ranking meant for
+our own switches. Before that fix the pilot never played Boss's Orders
+(0 of 11 opportunities in the audited game, two missed on-board wins);
+after it, gust lines evaluate correctly and get played.
 
 ## Repo layout
 

@@ -1,0 +1,2 @@
+game 1/20: win (turns=15)
+game 2/20: win (turns=17)
