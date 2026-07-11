@@ -36,3 +36,8 @@ game 35/40: loss (turns=11)
 game 36/40: win (turns=13)
 game 37/40: loss (turns=14)
 game 38/40: win (turns=15)
+game 39/40: loss (turns=12)
+game 40/40: loss (turns=15)
+
+main vs baselines.gosecond_agent: 20W-18L-2D (50.0% win) crashes=0
+avg turns 16.2, wall 1418.9s, agent time p0=711.0s p1=706.4s (17.77s/game vs 17.66s/game)
