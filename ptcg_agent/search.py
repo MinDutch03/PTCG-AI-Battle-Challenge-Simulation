@@ -26,8 +26,12 @@ MAX_DETERMINIZATIONS = 16
 MAX_ROLLOUT_STEPS = 120
 MAX_CANDIDATES = 16
 
+# Search health: failures fall back per-decision; only a clearly systemic
+# failure count disables search for the game. Stats are printed to stderr by
+# main.py so Kaggle agent logs show whether search was alive.
 _search_failures = 0
-_SEARCH_DISABLED_AFTER = 5
+_search_successes = 0
+_SEARCH_DISABLED_AFTER = 25
 
 
 def _candidates(obs: Observation, rng: random.Random) -> list[list[int]]:
@@ -95,7 +99,7 @@ def _rollout(state, stop_turn: int, rng: random.Random):
 def decide(obs: Observation, my_deck_list: list[int], deadline: float,
            rng: random.Random, safety: bool = True) -> list[int]:
     """Best selection for this observation, within the time budget."""
-    global _search_failures
+    global _search_failures, _search_successes
 
     sel = obs.select
     n = len(sel.option)
@@ -156,7 +160,15 @@ def decide(obs: Observation, my_deck_list: list[int], deadline: float,
                 active = scored_now[:6]
     except Exception:
         _search_failures += 1
+        if _search_failures <= 3 or _search_failures % 10 == 0:
+            import sys
+            import traceback
+            print(f"[ptcg] search failure #{_search_failures}:",
+                  file=sys.stderr)
+            traceback.print_exc()
         return choose(obs, rng)
+
+    _search_successes += 1
 
     # Only survivors of the screening pass compete: a pruned candidate's
     # single-sample score must not beat a multi-sample average on a fluke.

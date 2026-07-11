@@ -108,6 +108,15 @@ def make_agent(deck: list[int] | None = None, seed: int = 20260711,
             if not _IMPORTS_OK:
                 return fallback(obs_dict)
             obs = to_observation_class(obs_dict)
+            state["n"] = state.get("n", 0) + 1
+            if state["n"] % 25 == 1:
+                # Search-health heartbeat; shows up in Kaggle agent logs.
+                print(f"[ptcg] decision {state['n']}: turn "
+                      f"{obs.current.turn if obs.current else '?'} "
+                      f"search ok={search._search_successes} "
+                      f"fail={search._search_failures} "
+                      f"overage={obs_dict.get('remainingOverageTime', '?')}",
+                      file=sys.stderr, flush=True)
             budget = _budget(obs_dict, obs)
             if budget <= 0:
                 return choose(obs, rng)

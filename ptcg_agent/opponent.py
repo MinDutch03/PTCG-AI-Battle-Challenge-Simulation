@@ -25,11 +25,17 @@ def _load_meta() -> list[tuple[str, Counter]]:
         deck_dir = os.path.join(_HERE, "meta_decks")
         if os.path.isdir(deck_dir):
             for fn in sorted(os.listdir(deck_dir)):
-                if fn.endswith(".csv"):
+                # skip hidden/AppleDouble junk; never let one bad file
+                # empty the whole library
+                if not fn.endswith(".csv") or fn.startswith("."):
+                    continue
+                try:
                     with open(os.path.join(deck_dir, fn)) as f:
                         ids = [int(x) for x in f.read().split() if x.strip()]
-                    if len(ids) == 60:
-                        _META.append((fn[:-4], Counter(ids)))
+                except (OSError, ValueError, UnicodeDecodeError):
+                    continue
+                if len(ids) == 60:
+                    _META.append((fn[:-4], Counter(ids)))
     return _META
 
 
