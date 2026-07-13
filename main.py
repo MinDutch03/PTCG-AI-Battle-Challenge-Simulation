@@ -90,6 +90,10 @@ def _budget(obs_dict: dict, obs) -> float:
         return 0.0  # heuristics only, preserve the clock
     if obs.select.type not in (SelectType.MAIN, SelectType.ATTACK):
         base *= 0.6
+    # Late-game decisions decide close prize races AND cost more per search
+    # sample (search_begin replays the whole history) — scale up with turn.
+    turn = obs.current.turn if obs.current else 0
+    base *= 1.0 + min(turn, 20) / 15.0
     return base * _TIME_SCALE
 
 
