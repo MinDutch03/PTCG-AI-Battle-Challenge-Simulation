@@ -44,6 +44,16 @@ def prize_value(card_id: int) -> int:
     return 1
 
 
+@lru_cache(maxsize=1)
+def _evolvable_names() -> frozenset:
+    return frozenset(c.evolvesFrom for c in card_db().values() if c.evolvesFrom)
+
+
+def has_evolution(card_id: int) -> bool:
+    c = card_db().get(card_id)
+    return c is not None and c.name in _evolvable_names()
+
+
 def stage(card_id: int) -> int:
     c = card_db().get(card_id)
     if c is None:

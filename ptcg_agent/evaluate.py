@@ -4,12 +4,26 @@ Operates on the dataclass `State` returned by the search API. Scale guide:
 one prize card ~ 1000, so a win (+inf-ish) > prizes > damage > development.
 """
 
+from functools import lru_cache
+
 from cg.api import Pokemon, State
 
-from .cards import card_db, prize_value, stage
+from .cards import attack_db, card_db, prize_value, stage
 
 WIN = 1_000_000
 PRIZE = 1000.0
+
+
+@lru_cache(maxsize=2048)
+def _useful_energy_cap(card_id: int) -> int:
+    """Energy beyond the priciest attack cost is idle risk, not value:
+    a KO takes every attached card with it (audited losses stacked 6 on one
+    attacker and lost the game to energy bankruptcy)."""
+    c = card_db().get(card_id)
+    if c is None or not c.attacks:
+        return 1
+    adb = attack_db()
+    return max((len(adb[a].energies) for a in c.attacks if a in adb), default=1)
 
 
 def _pokemon_score(p: Pokemon, on_active: bool) -> float:
@@ -19,8 +33,13 @@ def _pokemon_score(p: Pokemon, on_active: bool) -> float:
     if c is not None:
         s += c.hp * 0.35
         s += stage(p.id) * 35.0
-    s += min(len(p.energies), 4) * 28.0
+    cap = _useful_energy_cap(p.id)
+    n = len(p.energies)
+    s += min(n, cap) * 28.0 + max(n - cap, 0) * 4.0
     s += len(p.tools) * 10.0
+    # An undeveloped multi-prize body is a gift target for gust effects.
+    if n == 0:
+        s -= 55.0 * (prize_value(p.id) - 1)
     return s
 
 

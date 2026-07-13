@@ -179,9 +179,17 @@ def choose(obs: Observation, rng: random.Random | None = None) -> list[int]:
     # Selections that target Pokemon in play.
     if ctx in (SelectContext.DAMAGE, SelectContext.DAMAGE_COUNTER,
                SelectContext.DAMAGE_COUNTER_ANY):
-        # Hurt the opponent's Pokemon closest to a KO.
-        return top([-_remaining_hp(state, o) if o.playerIndex != me else -99999
-                    for o in opts], count)
+        # Hurt the opponent's Pokemon closest to a KO, weighted by its prize
+        # yield (chip toward multi-prize KOs, not protected chaff).
+        def chip_value(o):
+            if o.playerIndex == me:
+                return -99999.0
+            p = _pokemon_at(state, o.playerIndex, o.area, o.index)
+            if p is None:
+                return -_remaining_hp(state, o)
+            from .cards import prize_value
+            return -p.hp + 60.0 * prize_value(p.id)
+        return top([chip_value(o) for o in opts], count)
     if ctx in (SelectContext.HEAL, SelectContext.REMOVE_DAMAGE_COUNTER):
         def healing(o):
             p = _pokemon_at(state, o.playerIndex, o.area, o.index)
@@ -190,7 +198,8 @@ def choose(obs: Observation, rng: random.Random | None = None) -> list[int]:
     if ctx in (SelectContext.SETUP_ACTIVE_POKEMON, SelectContext.TO_ACTIVE,
                SelectContext.SWITCH):
         if ctx == SelectContext.SETUP_ACTIVE_POKEMON:
-            # Options are cards in hand; judge by card quality.
+            # Options are cards in hand. Lead with an evolving basic: support
+            # pieces (Munkidori etc.) opened as the active donate early prizes.
             def setup_value(o):
                 try:
                     card = state.players[me].hand[o.index]
@@ -199,8 +208,11 @@ def choose(obs: Observation, rng: random.Random | None = None) -> list[int]:
                 c = card_db().get(card.id)
                 if c is None:
                     return 0.0
+                from .cards import has_evolution, prize_value
+                evolves = has_evolution(card.id)
                 best = max((_attack_damage(a) for a in c.attacks), default=0)
-                return c.hp * 0.4 + best * 0.5
+                return c.hp * 0.2 + best * 0.2 + 80.0 * evolves \
+                    - 50.0 * (prize_value(card.id) - 1)
             return top([setup_value(o) for o in opts], count)
 
         def promote_value(o):
@@ -230,7 +242,14 @@ def choose(obs: Observation, rng: random.Random | None = None) -> list[int]:
     if ctx in (SelectContext.DISCARD, SelectContext.TO_DECK,
                SelectContext.TO_DECK_BOTTOM, SelectContext.TO_PRIZE,
                SelectContext.DISCARD_CARD_OR_ATTACHED_CARD):
-        # Give up the least valuable cards.
+        # Give up the least valuable cards — but energy value is scarcity-
+        # dependent: pitching the last attack-enabling energies loses games.
+        hand = state.players[me].hand or []
+        hand_energy = sum(1 for c in hand
+                          if (cd := card_db().get(c.id)) is not None
+                          and cd.cardType in (CardType.BASIC_ENERGY,
+                                              CardType.SPECIAL_ENERGY))
+
         def discard_value(o):
             cid = o.cardId
             if cid is None and o.area == AreaType.HAND and o.index is not None:
@@ -238,7 +257,15 @@ def choose(obs: Observation, rng: random.Random | None = None) -> list[int]:
                     cid = state.players[o.playerIndex or me].hand[o.index].id
                 except (IndexError, TypeError):
                     cid = None
-            return _card_value(cid) if cid is not None else 20.0
+            if cid is None:
+                return 20.0
+            v = _card_value(cid)
+            c = card_db().get(cid)
+            if c is not None and c.cardType in (CardType.BASIC_ENERGY,
+                                                CardType.SPECIAL_ENERGY) \
+                    and hand_energy <= 2:
+                v += 40.0  # scarce energy: keep over mid trainers
+            return v
         return top([discard_value(o) for o in opts], max(lo, min(count, hi)),
                    reverse=False)
     if ctx in (SelectContext.TO_HAND, SelectContext.TO_FIELD,
