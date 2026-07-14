@@ -63,27 +63,28 @@ def perturb(w, rng, sigma):
     return out
 
 
-def play_batch(cand, inc, games, rng):
-    """Candidate-weights pilot vs incumbent-weights pilot. Returns wins."""
+def _play_one(spec):
+    """One game in a worker process (each process owns its own engine)."""
+    cand, inc, my_deck, opp_deck, swap, seed = spec
     import main as M
     from tools.run_match import play_game
 
-    wins = 0
+    a = M.make_agent(my_deck, seed=seed, weights=cand)
+    b = M.make_agent(opp_deck, seed=seed + 1, weights=inc)
+    p0, p1 = (b, a) if swap else (a, b)
+    result, _, _ = play_game(p0, p1)
+    return result in (0, 1) and ((result == 1) if swap else (result == 0))
+
+
+def play_batch(pool, cand, inc, games, rng):
+    """Candidate-weights pilot vs incumbent-weights pilot. Returns wins."""
     plan = []
     for my_deck, opp_deck, share in MATCHUPS:
         plan += [(my_deck, opp_deck)] * max(1, round(games * share))
     plan = plan[:games]
-    for g, (my_deck, opp_deck) in enumerate(plan):
-        a = M.make_agent(read_deck(my_deck), seed=rng.randrange(1 << 30),
-                         weights=cand)
-        b = M.make_agent(read_deck(opp_deck), seed=rng.randrange(1 << 30),
-                         weights=inc)
-        swap = g % 2 == 1
-        p0, p1 = (b, a) if swap else (a, b)
-        result, _, _ = play_game(p0, p1)
-        if result in (0, 1) and ((result == 1) if swap else (result == 0)):
-            wins += 1  # the candidate-weights seat won
-    return wins
+    specs = [(cand, inc, read_deck(md), read_deck(od), g % 2 == 1,
+              rng.randrange(1 << 30)) for g, (md, od) in enumerate(plan)]
+    return sum(pool.map(_play_one, specs))
 
 
 def main():
@@ -93,9 +94,13 @@ def main():
     ap.add_argument("--sigma", type=float, default=0.35)
     ap.add_argument("--adopt", type=float, default=0.60,
                     help="candidate win rate needed for adoption")
+    ap.add_argument("--workers", type=int, default=6)
     ap.add_argument("--seed", type=int, default=0)
     args = ap.parse_args()
 
+    import multiprocessing as mp
+
+    pool = mp.get_context("fork").Pool(args.workers)
     rng = random.Random(args.seed or int(time.time()))
     incumbent = load_incumbent()
     deadline = time.time() + args.hours * 3600
@@ -105,7 +110,7 @@ def main():
         it += 1
         cand = perturb(incumbent, rng, args.sigma)
         t0 = time.time()
-        wins = play_batch(cand, incumbent, args.games, rng)
+        wins = play_batch(pool, cand, incumbent, args.games, rng)
         rate = wins / args.games
         take = rate >= args.adopt
         if take:
