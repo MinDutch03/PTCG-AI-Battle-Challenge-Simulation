@@ -98,8 +98,10 @@ def _budget(obs_dict: dict, obs) -> float:
 
 
 def make_agent(deck: list[int] | None = None, seed: int = 20260711,
-               safety: bool = True):
-    """Build an agent closure bound to a specific deck (for local harnesses)."""
+               safety: bool = True, weights: dict | None = None):
+    """Build an agent closure bound to a specific deck (for local harnesses).
+
+    `weights` overrides the evaluation weights (used by tools/tune_eval.py)."""
     rng = random.Random(seed)
     state = {"deck": deck}
 
@@ -126,7 +128,7 @@ def make_agent(deck: list[int] | None = None, seed: int = 20260711,
                 return choose(obs, rng)
             deadline = time.time() + budget
             return search.decide(obs, state["deck"], deadline, rng,
-                                 safety=safety)
+                                 safety=safety, weights=weights)
         except Exception:
             try:
                 if _IMPORTS_OK and obs_dict.get("select") is not None:

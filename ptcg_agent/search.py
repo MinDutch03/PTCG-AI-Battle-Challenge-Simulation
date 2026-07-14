@@ -7,6 +7,7 @@ Falls back to the pure heuristic policy on any search trouble.
 """
 
 import itertools
+import os
 import random
 import time
 
@@ -24,7 +25,8 @@ from . import determinize
 from .evaluate import evaluate
 from .heuristics import choose
 
-MAX_DETERMINIZATIONS = 24
+# PTCG_MAX_DETS caps determinizations (used by the tuner for fast games).
+MAX_DETERMINIZATIONS = int(os.environ.get("PTCG_MAX_DETS", 24))
 MAX_ROLLOUT_STEPS = 120
 MAX_CANDIDATES = 16
 
@@ -99,7 +101,8 @@ def _rollout(state, stop_turn: int, rng: random.Random):
 
 
 def decide(obs: Observation, my_deck_list: list[int], deadline: float,
-           rng: random.Random, safety: bool = True) -> list[int]:
+           rng: random.Random, safety: bool = True,
+           weights: dict | None = None) -> list[int]:
     """Best selection for this observation, within the time budget."""
     global _search_failures, _search_successes
 
@@ -147,7 +150,7 @@ def decide(obs: Observation, my_deck_list: list[int], deadline: float,
                     st = search_step(root.searchId, cands[ci])
                     st = _rollout(st, stop_turn, rng)
                     end = st.observation.current
-                    totals[ci] += evaluate(end, me)
+                    totals[ci] += evaluate(end, me, weights)
                     counts[ci] += 1
                     if end.result == me:
                         wins[ci] += 1
