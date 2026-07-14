@@ -1,0 +1,2 @@
+champion vs default at full depth: 21/48 (43.8%)
+GATE FAILED — do not ship

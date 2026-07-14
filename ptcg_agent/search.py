@@ -102,7 +102,8 @@ def _rollout(state, stop_turn: int, rng: random.Random):
 
 def decide(obs: Observation, my_deck_list: list[int], deadline: float,
            rng: random.Random, safety: bool = True,
-           weights: dict | None = None) -> list[int]:
+           weights: dict | None = None,
+           max_dets: int | None = None) -> list[int]:
     """Best selection for this observation, within the time budget."""
     global _search_failures, _search_successes
 
@@ -138,7 +139,7 @@ def decide(obs: Observation, my_deck_list: list[int], deadline: float,
 
     active = list(range(len(cands)))
     try:
-        for det_i in range(MAX_DETERMINIZATIONS):
+        for det_i in range(max_dets or MAX_DETERMINIZATIONS):
             if time.time() > deadline and det_i > 0:
                 break
             det = determinize.sample(obs, my_deck_list, rng)
