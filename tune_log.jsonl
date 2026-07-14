@@ -1,0 +1,71 @@
+{"iter": 1, "winrate": 0.5666666666666667, "adopted": false, "secs": 443, "weights": null}
+{"iter": 2, "winrate": 0.5, "adopted": false, "secs": 506, "weights": null}
+{"iter": 3, "winrate": 0.5333333333333333, "adopted": false, "secs": 421, "weights": null}
+{"iter": 4, "winrate": 0.7333333333333333, "adopted": true, "secs": 453, "weights": {"prize": 1000.0, "dmg_frac": 0.5664, "body": 40.0, "hp": 0.2529, "stage": 35.0, "energy": 28.0, "energy_excess": 4.6699, "tool": 9.3772, "naked_ex": 55.0, "no_bench": 250.0, "hand": 13.436, "opp_hand": 6.0, "deckout": 300.0, "cond_hard": 60.0, "cond_soft": 35.0}}
+{"iter": 5, "winrate": 0.4666666666666667, "adopted": false, "secs": 742, "weights": null}
+{"iter": 6, "winrate": 0.7, "adopted": true, "secs": 455, "weights": {"prize": 1135.7294, "dmg_frac": 0.719, "body": 40.0, "hp": 0.2529, "stage": 35.0, "energy": 28.0, "energy_excess": 3.4254, "tool": 9.3772, "naked_ex": 55.0, "no_bench": 250.0, "hand": 13.436, "opp_hand": 3.9842, "deckout": 257.2954, "cond_hard": 60.0, "cond_soft": 35.0}}
+{"iter": 7, "winrate": 0.5, "adopted": false, "secs": 445, "weights": null}
+{"iter": 8, "winrate": 0.6666666666666666, "adopted": true, "secs": 484, "weights": {"prize": 1135.7294, "dmg_frac": 0.719, "body": 31.902, "hp": 0.2634, "stage": 36.8655, "energy": 28.0, "energy_excess": 3.4254, "tool": 9.3772, "naked_ex": 37.3679, "no_bench": 250.0, "hand": 13.436, "opp_hand": 4.6743, "deckout": 257.2954, "cond_hard": 60.0, "cond_soft": 35.0}}
+{"iter": 1, "winrate": 0.5333333333333333, "adopted": false, "secs": 91, "weights": null}
+{"iter": 2, "winrate": 0.4666666666666667, "adopted": false, "secs": 108, "weights": null}
+{"iter": 3, "winrate": 0.4666666666666667, "adopted": false, "secs": 130, "weights": null}
+{"iter": 4, "winrate": 0.5, "adopted": false, "secs": 95, "weights": null}
+{"iter": 5, "winrate": 0.5, "adopted": false, "secs": 103, "weights": null}
+{"iter": 6, "winrate": 0.5333333333333333, "adopted": false, "secs": 108, "weights": null}
+{"iter": 7, "winrate": 0.6333333333333333, "adopted": true, "secs": 112, "weights": {"prize": 1135.7294, "dmg_frac": 0.719, "body": 31.902, "hp": 0.2634, "stage": 36.8655, "energy": 28.0, "energy_excess": 3.4254, "tool": 7.5745, "naked_ex": 26.5416, "no_bench": 250.0, "hand": 13.436, "opp_hand": 4.6743, "deckout": 242.3388, "cond_hard": 56.6856, "cond_soft": 33.9444}}
+{"iter": 8, "winrate": 0.5, "adopted": false, "secs": 95, "weights": null}
+{"iter": 9, "winrate": 0.3, "adopted": false, "secs": 111, "weights": null}
+{"iter": 10, "winrate": 0.6333333333333333, "adopted": true, "secs": 107, "weights": {"prize": 1135.7294, "dmg_frac": 0.8188, "body": 31.902, "hp": 0.2405, "stage": 36.8655, "energy": 28.0, "energy_excess": 3.4254, "tool": 7.5745, "naked_ex": 26.5416, "no_bench": 250.0, "hand": 9.868, "opp_hand": 4.6743, "deckout": 315.4377, "cond_hard": 56.6856, "cond_soft": 42.3618}}
+{"iter": 11, "winrate": 0.43333333333333335, "adopted": false, "secs": 112, "weights": null}
+{"iter": 12, "winrate": 0.5666666666666667, "adopted": false, "secs": 118, "weights": null}
+{"iter": 13, "winrate": 0.8, "adopted": true, "secs": 110, "weights": {"prize": 1135.7294, "dmg_frac": 0.8188, "body": 31.902, "hp": 0.2478, "stage": 36.8655, "energy": 28.0, "energy_excess": 2.9476, "tool": 7.5745, "naked_ex": 36.1406, "no_bench": 250.0, "hand": 9.868, "opp_hand": 4.6743, "deckout": 474.1768, "cond_hard": 62.7329, "cond_soft": 42.3618}}
+{"iter": 14, "winrate": 0.5333333333333333, "adopted": false, "secs": 111, "weights": null}
+{"iter": 15, "winrate": 0.43333333333333335, "adopted": false, "secs": 114, "weights": null}
+{"iter": 16, "winrate": 0.5666666666666667, "adopted": false, "secs": 121, "weights": null}
+{"iter": 17, "winrate": 0.5666666666666667, "adopted": false, "secs": 108, "weights": null}
+{"iter": 18, "winrate": 0.5333333333333333, "adopted": false, "secs": 112, "weights": null}
+{"iter": 19, "winrate": 0.6, "adopted": false, "secs": 116, "weights": null}
+{"iter": 20, "winrate": 0.5666666666666667, "adopted": false, "secs": 113, "weights": null}
+{"iter": 21, "winrate": 0.5, "adopted": false, "secs": 113, "weights": null}
+{"iter": 22, "winrate": 0.8, "adopted": true, "secs": 110, "weights": {"prize": 1135.7294, "dmg_frac": 0.8188, "body": 31.902, "hp": 0.3137, "stage": 35.0381, "energy": 28.0, "energy_excess": 2.9476, "tool": 6.6964, "naked_ex": 36.0091, "no_bench": 250.0, "hand": 7.9855, "opp_hand": 4.6743, "deckout": 474.1768, "cond_hard": 62.7329, "cond_soft": 42.3618}}
+{"iter": 23, "winrate": 0.6333333333333333, "adopted": true, "secs": 93, "weights": {"prize": 1890.7952, "dmg_frac": 0.8188, "body": 34.8272, "hp": 0.3137, "stage": 31.804, "energy": 28.0, "energy_excess": 2.9476, "tool": 6.6964, "naked_ex": 45.7336, "no_bench": 252.3966, "hand": 7.9855, "opp_hand": 4.6743, "deckout": 474.1768, "cond_hard": 62.7329, "cond_soft": 42.3618}}
+{"iter": 24, "winrate": 0.5, "adopted": false, "secs": 100, "weights": null}
+{"iter": 25, "winrate": 0.5333333333333333, "adopted": false, "secs": 110, "weights": null}
+{"iter": 26, "winrate": 0.43333333333333335, "adopted": false, "secs": 106, "weights": null}
+{"iter": 27, "winrate": 0.4, "adopted": false, "secs": 104, "weights": null}
+{"iter": 28, "winrate": 0.4, "adopted": false, "secs": 107, "weights": null}
+{"iter": 29, "winrate": 0.5333333333333333, "adopted": false, "secs": 1463, "weights": null}
+{"iter": 30, "winrate": 0.43333333333333335, "adopted": false, "secs": 99, "weights": null}
+{"iter": 31, "winrate": 0.5, "adopted": false, "secs": 103, "weights": null}
+{"iter": 32, "winrate": 0.5, "adopted": false, "secs": 94, "weights": null}
+{"iter": 33, "winrate": 0.6333333333333333, "adopted": true, "secs": 94, "weights": {"prize": 1890.7952, "dmg_frac": 0.8488, "body": 38.4741, "hp": 0.3042, "stage": 31.804, "energy": 28.0, "energy_excess": 3.3108, "tool": 6.6964, "naked_ex": 45.7336, "no_bench": 252.3966, "hand": 7.9855, "opp_hand": 4.6743, "deckout": 474.1768, "cond_hard": 62.7329, "cond_soft": 36.2976}}
+{"iter": 34, "winrate": 0.7333333333333333, "adopted": true, "secs": 99, "weights": {"prize": 2342.8431, "dmg_frac": 0.6678, "body": 38.4741, "hp": 0.3042, "stage": 31.804, "energy": 28.0, "energy_excess": 3.3108, "tool": 6.6964, "naked_ex": 45.7336, "no_bench": 252.3966, "hand": 9.7152, "opp_hand": 5.9755, "deckout": 505.4028, "cond_hard": 62.7329, "cond_soft": 36.2976}}
+{"iter": 35, "winrate": 0.4666666666666667, "adopted": false, "secs": 98, "weights": null}
+{"iter": 36, "winrate": 0.5333333333333333, "adopted": false, "secs": 101, "weights": null}
+{"iter": 37, "winrate": 0.4666666666666667, "adopted": false, "secs": 112, "weights": null}
+{"iter": 38, "winrate": 0.6, "adopted": false, "secs": 107, "weights": null}
+{"iter": 39, "winrate": 0.5, "adopted": false, "secs": 93, "weights": null}
+{"iter": 40, "winrate": 0.43333333333333335, "adopted": false, "secs": 137, "weights": null}
+{"iter": 41, "winrate": 0.4, "adopted": false, "secs": 121, "weights": null}
+{"iter": 42, "winrate": 0.4, "adopted": false, "secs": 109, "weights": null}
+{"iter": 43, "winrate": 0.6666666666666666, "adopted": true, "secs": 117, "weights": {"prize": 2342.8431, "dmg_frac": 0.6678, "body": 38.4741, "hp": 0.2525, "stage": 26.4849, "energy": 33.5369, "energy_excess": 3.3108, "tool": 6.6964, "naked_ex": 51.9764, "no_bench": 252.3966, "hand": 9.7152, "opp_hand": 6.1353, "deckout": 505.4028, "cond_hard": 62.7329, "cond_soft": 36.2976}}
+{"iter": 44, "winrate": 0.5, "adopted": false, "secs": 108, "weights": null}
+{"iter": 45, "winrate": 0.6666666666666666, "adopted": true, "secs": 119, "weights": {"prize": 2318.7484, "dmg_frac": 0.6678, "body": 38.4741, "hp": 0.2525, "stage": 26.4849, "energy": 32.0072, "energy_excess": 3.3108, "tool": 6.6964, "naked_ex": 51.9764, "no_bench": 301.6398, "hand": 9.9201, "opp_hand": 6.1353, "deckout": 505.4028, "cond_hard": 62.951, "cond_soft": 36.2976}}
+{"iter": 46, "winrate": 0.4666666666666667, "adopted": false, "secs": 119, "weights": null}
+{"iter": 47, "winrate": 0.4666666666666667, "adopted": false, "secs": 119, "weights": null}
+{"iter": 48, "winrate": 0.43333333333333335, "adopted": false, "secs": 118, "weights": null}
+{"iter": 49, "winrate": 0.5, "adopted": false, "secs": 95, "weights": null}
+{"iter": 50, "winrate": 0.7, "adopted": true, "secs": 108, "weights": {"prize": 2318.7484, "dmg_frac": 0.6678, "body": 35.7397, "hp": 0.2656, "stage": 16.1081, "energy": 32.0072, "energy_excess": 3.3108, "tool": 6.6964, "naked_ex": 51.9764, "no_bench": 301.6398, "hand": 10.6959, "opp_hand": 5.6977, "deckout": 505.4028, "cond_hard": 62.951, "cond_soft": 36.2976}}
+{"iter": 51, "winrate": 0.5333333333333333, "adopted": false, "secs": 102, "weights": null}
+{"iter": 52, "winrate": 0.6, "adopted": false, "secs": 90, "weights": null}
+{"iter": 53, "winrate": 0.5666666666666667, "adopted": false, "secs": 115, "weights": null}
+{"iter": 54, "winrate": 0.5666666666666667, "adopted": false, "secs": 97, "weights": null}
+{"iter": 55, "winrate": 0.5666666666666667, "adopted": false, "secs": 86, "weights": null}
+{"iter": 56, "winrate": 0.5, "adopted": false, "secs": 94, "weights": null}
+{"iter": 57, "winrate": 0.7333333333333333, "adopted": true, "secs": 98, "weights": {"prize": 1991.1674, "dmg_frac": 0.6678, "body": 35.7397, "hp": 0.2656, "stage": 12.2309, "energy": 32.0072, "energy_excess": 3.3108, "tool": 6.6964, "naked_ex": 51.9764, "no_bench": 286.1695, "hand": 10.6959, "opp_hand": 5.6977, "deckout": 448.1071, "cond_hard": 62.951, "cond_soft": 53.2608}}
+{"iter": 58, "winrate": 0.4666666666666667, "adopted": false, "secs": 117, "weights": null}
+{"iter": 59, "winrate": 0.5666666666666667, "adopted": false, "secs": 126, "weights": null}
+{"iter": 60, "winrate": 0.5, "adopted": false, "secs": 95, "weights": null}
+{"iter": 61, "winrate": 0.6666666666666666, "adopted": true, "secs": 124, "weights": {"prize": 1991.1674, "dmg_frac": 0.5781, "body": 33.9938, "hp": 0.2801, "stage": 11.9054, "energy": 36.8815, "energy_excess": 3.3108, "tool": 6.6964, "naked_ex": 51.9764, "no_bench": 286.1695, "hand": 10.6959, "opp_hand": 5.6977, "deckout": 448.1071, "cond_hard": 62.951, "cond_soft": 53.2608}}
+{"iter": 62, "winrate": 0.6, "adopted": false, "secs": 94, "weights": null}
+{"iter": 63, "winrate": 0.6, "adopted": false, "secs": 648, "weights": null}

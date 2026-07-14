@@ -1,0 +1,17 @@
+{
+ "body": 33.9938,
+ "cond_hard": 62.951,
+ "cond_soft": 53.2608,
+ "deckout": 448.1071,
+ "dmg_frac": 0.5781,
+ "energy": 36.8815,
+ "energy_excess": 3.3108,
+ "hand": 10.6959,
+ "hp": 0.2801,
+ "naked_ex": 51.9764,
+ "no_bench": 286.1695,
+ "opp_hand": 5.6977,
+ "prize": 1991.1674,
+ "stage": 11.9054,
+ "tool": 6.6964
+}
