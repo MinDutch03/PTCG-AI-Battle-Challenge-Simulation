@@ -26,7 +26,7 @@ from .evaluate import evaluate
 from .heuristics import choose
 
 # PTCG_MAX_DETS caps determinizations (used by the tuner for fast games).
-MAX_DETERMINIZATIONS = int(os.environ.get("PTCG_MAX_DETS", 24))
+MAX_DETERMINIZATIONS = int(os.environ.get("PTCG_MAX_DETS", 64))
 MAX_ROLLOUT_STEPS = 120
 MAX_CANDIDATES = 16
 
